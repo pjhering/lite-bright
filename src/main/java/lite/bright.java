@@ -7,7 +7,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import static java.lang.System.out;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
@@ -27,7 +30,9 @@ public class bright {
                 
                 try {
                     
-                    BufferedImage image = ImageIO.read(file);
+                    BufferedImage raw = ImageIO.read(file);
+                    BufferedImage image = new BufferedImage(raw.getWidth(), raw.getHeight(), BufferedImage.TYPE_INT_RGB);
+                    image.getGraphics().drawImage(raw, 0, 0, null);
                     
                     if(image != null) {
                         
@@ -115,13 +120,27 @@ public class bright {
     
     private static void index(FileWriter out) throws IOException {
         
+        List<String> list = new ArrayList<>();
+        
         for(Color c : map.keySet()) {
             
             Character key = map.get(c);
-            out.write(key + " " + c.toString() + "\n");
+            list.add(key + " " + hexify(c));
+        }
+        
+        Collections.sort(list);
+        
+        for(String s : list) {
+            out.write(s);
+            out.write("\n");
         }
         
         out.write("\n");
+    }
+    
+    private static String hexify(Color color) {
+        
+        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
     }
     
     private static void info(String message) {
